@@ -37,6 +37,8 @@ MFRC522::MIFARE_Key key;
 float stand_height = 177.8;   //for 5feet 10inch stand just for testing agains my height
 float measured_distance = 0;
 float person_height = 0;
+float person_height__in_meter = 0;
+float bmi = 0;
 // uuuuu
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 
@@ -52,7 +54,7 @@ void setup() {
   //initializing the tare. 
   scale.tare();	//Reset the scale to 0gz
 }
- 
+
 void loop() {
 
   // lllll
@@ -70,6 +72,7 @@ void loop() {
   Serial.println("cm\n");
   measured_distance =  sonar.ping_cm();
   person_height = stand_height - measured_distance;
+  person_height__in_meter = person_height / 100;
 //  Serial.print("Person's height: ");
 //  Serial.print(person_height);
 //  Serial.print("\n");
@@ -77,7 +80,10 @@ void loop() {
   Serial.print(person_height * 0.0328);
   Serial.print("\n");
 
+  // bmi logic goes here
+  
 
+  
   // Reset the loop if no new card present on the sensor/reader. This saves the entire process when idle.
   if ( ! rfid.PICC_IsNewCardPresent())
     return;
