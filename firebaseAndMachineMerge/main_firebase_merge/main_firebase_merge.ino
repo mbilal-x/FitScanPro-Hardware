@@ -18,8 +18,17 @@ String read_data = "";
 #include <MFRC522.h>
 
 // firebase
-#define FIREBASE_HOST "testing2-4f7dd-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
+
+// hassaan's firebase link
+#define FIREBASE_HOST "iotproject-a16f1-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "AIzaSyBs-ygCraphLawYvpQgSbb_p_LmH9CLUJ4"
+
+// my testing2 firebase realtime database link
+// #define FIREBASE_HOST "testing2-4f7dd-default-rtdb.firebaseio.com"
+// #define FIREBASE_AUTH "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
+
+
+
 #define WIFI_SSID "HUAWEI-wzJd"                                          
 #define WIFI_PASSWORD "Anw98JEj"  
 
@@ -39,7 +48,7 @@ float calibration_factor = 14450; //14255
 
 // rfid
 #define SS_PIN D8
-#define RST_PIN D3
+#define RST_PIN D4
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
 MFRC522::MIFARE_Key key;
 
@@ -185,21 +194,16 @@ if (Firebase.getString(firebaseData, "/data")) {
   }
       delay(3000);  
 
+
 // rfid
-  // Reset the loop if no new card present on the sensor/reader. This saves the entire process when idle.
-  if ( ! rfid.PICC_IsNewCardPresent())
-    return;
-  // Verify if the NUID has been readed
-  if ( ! rfid.PICC_ReadCardSerial())
-    return;
   MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
   Serial.print(F("RFID Tag UID:"));
   printHex(rfid.uid.uidByte, rfid.uid.size);
   Serial.println("");
   rfid.PICC_HaltA(); // Halt PICC
+}
+ // void loop ends
 
-} // void loop ends
- 
 // rfid
 void printHex(byte *buffer, byte bufferSize) { //Routine to dump a byte array as hex values to Serial. 
   for (byte i = 0; i < bufferSize; i++) {
@@ -207,3 +211,4 @@ void printHex(byte *buffer, byte bufferSize) { //Routine to dump a byte array as
     Serial.print(buffer[i], HEX); 
   }
 }
+
