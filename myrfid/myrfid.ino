@@ -40,6 +40,8 @@ void loop() {
   Serial.println("");
  
   rfid.PICC_HaltA(); // Halt PICC
+
+  delay(2000);
 }
 
 //Routine to dump a byte array as hex values to Serial. 

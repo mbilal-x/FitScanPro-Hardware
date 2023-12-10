@@ -14,23 +14,30 @@ String read_data = "";
 
 // load cell
 #include "HX711.h"
+
+
+// rfid
 #include <SPI.h>
 #include <MFRC522.h>
 
 // firebase
 
 // hassaan's firebase link
-#define FIREBASE_HOST "iotproject-a16f1-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "AIzaSyBs-ygCraphLawYvpQgSbb_p_LmH9CLUJ4"
+// #define FIREBASE_HOST "iotproject-a16f1-default-rtdb.firebaseio.com"
+// #define FIREBASE_AUTH "AIzaSyBs-ygCraphLawYvpQgSbb_p_LmH9CLUJ4"
 
 // my testing2 firebase realtime database link
-// #define FIREBASE_HOST "testing2-4f7dd-default-rtdb.firebaseio.com"
-// #define FIREBASE_AUTH "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
+#define FIREBASE_HOST "testing2-4f7dd-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
 
 
-
+// bilal's wifi
 #define WIFI_SSID "HUAWEI-wzJd"                                          
-#define WIFI_PASSWORD "Anw98JEj"  
+#define WIFI_PASSWORD "Anw98JEj"
+
+// Mushi's hotspot
+// #define WIFI_SSID "SHO Gulbano"                                          
+// #define WIFI_PASSWORD "@minecraft@"  
 
 
 // ultrasonic
@@ -63,14 +70,10 @@ NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and
 
 
 void setup() { 
+
   Serial.begin(9600);
 
-// rfid
-  SPI.begin(); // Init SPI bus
-  rfid.PCD_Init(); // Init RC522 
-
 // firebase
-  pinMode(LED_BUILTIN, OUTPUT);         
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);       
   Serial.print("Connecting to ");
   Serial.print(WIFI_SSID);
@@ -101,12 +104,32 @@ void setup() {
   // scale.tare();	//Reset the scale to 0gz
 
 
+  
+// rfid
+  SPI.begin(); // Init SPI bus
+  rfid.PCD_Init(); // Init RC522 
 }
 
 void loop() {
 
+  Serial.println("one"); ______________________________________
+ 
+ // rfid
+  if ( ! rfid.PICC_IsNewCardPresent())
+    return;
+ 
+  // Verify if the NUID has been readed
+  if ( ! rfid.PICC_ReadCardSerial())
+    return;
+  
+// rfid
+  MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
+  Serial.print(F("RFID Tag UID:"));
+  printHex(rfid.uid.uidByte, rfid.uid.size);
+  Serial.println("");
+  rfid.PICC_HaltA(); // Halt PICC
 
-
+Serial.println("four");
 
 // load cell => (two) stuff turned off for testing code without loadcell at home.
 
@@ -146,24 +169,13 @@ void loop() {
   Serial.print(BMI);
   Serial.print("\n");
 
-  delay(5000);
 
-
-  // firebase
-  if(send_data == "ON")
-    send_data = "OFF";
-  else
-    send_data = "ON";
-
-if (Firebase.setString(firebaseData, "/data", send_data)) {   
+// firebase
+if (Firebase.setString(firebaseData, "/bmi", BMI)) {   
   
-               Serial.print("data ");
-               Serial.print("'");               
-               Serial.print(send_data);
-               Serial.print("'");                  
-               Serial.println(" Uploaded Successfully");
-             
-     }
+        Serial.println("BMI Uploaded Successfully");
+          
+    }
 
 else {        
     Serial.println(firebaseData.errorReason());
@@ -171,41 +183,24 @@ else {
 
 delay(1000);
 
-if (Firebase.getString(firebaseData, "/data")) {   
+if (Firebase.getString(firebaseData, "/bmi")) {   
 
       read_data = firebaseData.stringData();
-      Serial.print("Read_data = ");     
+      Serial.print("Read_BMI = ");     
       Serial.println(read_data);
 
-  if (read_data == "ON") 
-  {                                 
-    Serial.println("LED turned ON");                                                        
-    digitalWrite(LED_BUILTIN, LOW);    // LED active low 
-  } 
-  else if (read_data == "OFF") 
-  {                                            
-    Serial.println("LED turned OFF");
-    digitalWrite(LED_BUILTIN, HIGH);          
-  }
-    Serial.println();
-  } 
-  else {
+}
+else {
     Serial.println(firebaseData.errorReason());
   }
-      delay(3000);  
 
-
-// rfid
-  MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
-  Serial.print(F("RFID Tag UID:"));
-  printHex(rfid.uid.uidByte, rfid.uid.size);
-  Serial.println("");
-  rfid.PICC_HaltA(); // Halt PICC
-}
+delay(2000); 
  // void loop ends
+}
 
 // rfid
-void printHex(byte *buffer, byte bufferSize) { //Routine to dump a byte array as hex values to Serial. 
+//Routine to dump a byte array as hex values to Serial. 
+void printHex(byte *buffer, byte bufferSize) {
   for (byte i = 0; i < bufferSize; i++) {
     Serial.print(buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(buffer[i], HEX); 
