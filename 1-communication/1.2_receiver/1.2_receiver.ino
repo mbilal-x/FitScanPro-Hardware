@@ -4,7 +4,7 @@
 // uuuuu
   float standHeight = 177.8;   //for 5feet 10inch stand just for testing agains my height
   float measuredDistance = 0;
-  float person_height = 0;
+  float personHeight = 0;
   float personHeightInMeter = 0;
   float bmi = 0;
 
