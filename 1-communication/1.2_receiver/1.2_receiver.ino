@@ -1,7 +1,17 @@
-// Receiver Arduino Code
+// Receiver Arduino Code for height weight and calculating BMI
+// And adding all other stuff in next version 1.2 FOLDER
+
+// uuuuu
+  float standHeight = 177.8;   //for 5feet 10inch stand just for testing agains my height
+  float measuredDistance = 0;
+  float person_height = 0;
+  float personHeightInMeter = 0;
+  float bmi = 0;
+
 
 void setup() {
   Serial.begin(9600); // Initialize serial communication
+
 }
 
 void loop() {
@@ -13,11 +23,19 @@ void loop() {
     float receivedHeight = data.substring(0, data.indexOf(',')).toFloat();
     int receivedWeight = data.substring(data.indexOf(',') + 1).toInt();
 
-    // Do something with the received data
-    // For now, just print it to the Serial Monitor
-    Serial.print("Received Height: ");
-    Serial.println(receivedHeight);
+// uuuuuu
+    personHeight = standHeight - receivedHeight;
+    personHeightInMeter = personHeight / 100;
+    Serial.print("Person's height in feet: ");
+    Serial.print(personHeight * 0.0328);
+    Serial.print("\n");
+
     Serial.print("Received Weight: ");
     Serial.println(receivedWeight);
+
+    bmi = receivedWeight / (personHeightInMeter * personHeightInMeter);
+    Serial.print("bmi: ");
+    Serial.println(bmi);
+
   }
 }
