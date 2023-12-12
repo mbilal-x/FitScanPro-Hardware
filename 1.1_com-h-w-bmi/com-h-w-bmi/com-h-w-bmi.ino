@@ -30,8 +30,8 @@ float bmi = 0;
 // uuuuu
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 
-// weight
-float weight = 60; 
+// dummy weight
+// float weight = 60; 
 
 void setup() {
   Serial.begin(9600); // Initialize serial communication
