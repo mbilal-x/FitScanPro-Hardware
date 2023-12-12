@@ -3,6 +3,9 @@
 // uuuuu
 #include <NewPing.h>
 
+// load cell
+#include "HX711.h"
+
 // uuuuu
 #define TRIGGER_PIN  D7  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     D6  // Arduino pin tied to echo pin on the ultrasonic sensor.
@@ -51,7 +54,6 @@ void loop() {
   // load cell
   scale.set_scale(calibration_factor); //Adjust to this calibration factor
   // Serial.print(scale.get_units(), 2);
-
 
   Serial.print(measured_distance);
   Serial.print(",");
