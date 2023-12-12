@@ -35,7 +35,7 @@ const long utcOffsetInSeconds = 18000; //(UTC+5)
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
 
 // lcd
-LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27,16,4);  // set the LCD address to 0x27 or 0x20
 
 // uuuuu
   float standHeight = 177.8;   //for 5feet 10inch stand just for testing agains my height
@@ -82,16 +82,22 @@ const char pass[] = "Anw98JEj";
 // wifi connect function
 void connect() {
   Serial.print("checking wifi...");
-  // lcd message 
-  lcd.setCursor(1,0);   
-  lcd.print("checking wifi..");
+  // lcd
+  lcd.clear();
+  lcd.setCursor(0,0);   
+  lcd.print("checking wifi...");
   // firebase
+  int i = 0;
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(1000);
   }
 
   Serial.println("\n connected!");
+  // lcd message 
+  lcd.clear();
+  lcd.setCursor(0,1);   
+  lcd.print("CONNECTED");
 }
 
 
@@ -111,7 +117,7 @@ void setup() {
     lcd.init();                      // initialize the lcd 
     lcd.clear();
     lcd.backlight();
-    
+
   // time
     timeClient.begin();
     timeClient.setTimeOffset(utcOffsetInSeconds);
@@ -133,13 +139,13 @@ void addEntry (String temp)
   // ALL PRINT STATEMENTS MUTED FOR SERIAL COMMUNICATION
 
     // card found printed here [and not in the check if statement] to avoid delay
-    // Serial.println("Card found"); 
+    Serial.println("Card Detected"); 
     // lcd
     lcd.clear();
-    lcd.setCursor(1,1);   
+    lcd.setCursor(0,0);   
     lcd.print("CARD DETECTED!");
-    lcd.setCursor(2,1);   
-    lcd.print("DO NOT REMOVE");
+    lcd.setCursor(0,1);   
+    lcd.print("MEASURING DATA...");
 
 // time
   time_t epochTime = timeClient.getEpochTime();
@@ -166,16 +172,16 @@ void addEntry (String temp)
 
   //Print complete date:
   String currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay);
-  // Serial.print("Current date: ");
-  // Serial.println(currentDate);
+  Serial.print("Current date: ");
+  Serial.println(currentDate);
 
     if(Firebase.getInt(firebaseData, uidPath+"/users/"+temp)){
-      
+  
           alertMsg="LOGGING IN";
           // lcd
-          delay(3000);
+          delay(1000);
           lcd.clear();
-          lcd.setCursor(2,1);   
+          lcd.setCursor(0,0);   
           lcd.print(alertMsg);
           Serial.println(alertMsg);
 
@@ -186,7 +192,7 @@ void addEntry (String temp)
           updateData.set("weight", personWeight);
           updateData.set("bmi", bmi);
 
-          
+      
           if (Firebase.updateNode(firebaseData, uidPath+ "/users/"+temp, updateData)){
             Serial.println(firebaseData.dataPath() +"/"+ firebaseData.pushName()); 
           } else {
@@ -197,24 +203,23 @@ void addEntry (String temp)
           // Serial.println(alertMsg);
 
           // lcd
-          delay(3000);
+          delay(1000);
           lcd.clear();
-          lcd.setCursor(1,5); 
+          lcd.setCursor(0,0); 
           lcd.print(alertMsg);
           alertMsg="LOGGING OUT";
-          delay(3000);
+          delay(1000);
           lcd.clear();
-          lcd.setCursor(2,1);   
+          lcd.setCursor(0,1);   
           lcd.print(alertMsg);
-          delay(3000);
     }
     else
     {
-      // Serial.println("FAILED");
-      // Serial.println("REASON: " + firebaseData.errorReason());
+      Serial.println("FAILED");
+      Serial.println("REASON: " + firebaseData.errorReason());
       // lcd
       lcd.clear();
-      lcd.setCursor(1,1); 
+      lcd.setCursor(0,0); 
       lcd.print("LOGIN FAILED!");
       delay(5000);
     }
@@ -239,14 +244,36 @@ void loop() {
     // Serial.print(personHeight * 0.0328);
     // Serial.print("\n");
 
+    // height
+    Serial.print("Received Height: ");
+    Serial.println(personHeight);
     // weight
-    // Serial.print("Received Weight: ");
-    // Serial.println(receivedWeight);
+    Serial.print("Received Weight: ");
+    Serial.println(personWeight);
 
     // bmi
     bmi = personWeight / (personHeightInMeter * personHeightInMeter);
-    // Serial.print("bmi: ");
-    // Serial.println(bmi);
+    Serial.print("bmi: ");
+    Serial.println(bmi);
+
+    // lcd
+    lcd.clear();
+    // display weight
+      lcd.setCursor(0,0); 
+      lcd.print("WEIGHT: ");
+      lcd.print(personWeight);
+    // display height
+      lcd.setCursor(0,1); 
+      lcd.print("HEIGHT: ");
+      lcd.print(personHeight);
+    // display bmi
+      lcd.setCursor(-4,2); 
+      lcd.print("BMI: ");
+      lcd.print(bmi);
+    
+      delay(3000);
+      // lcd
+      lcd.clear();
   }
 
   timeClient.update();
@@ -270,15 +297,5 @@ void loop() {
     
   }
   rfid.halt();
-
-// lcd
-  lcd.clear();
-  lcd.setCursor(1,0);   
-  lcd.print("SCAN YOUR RFID");
-  lcd.setCursor(7,1);   
-  lcd.print(":)");
-  delay(500);
-  lcd.clear();
-
 
 }
