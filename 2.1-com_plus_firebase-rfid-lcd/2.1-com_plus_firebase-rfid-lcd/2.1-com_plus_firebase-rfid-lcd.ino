@@ -68,12 +68,12 @@ String months[12]={"January", "February", "March", "April", "May", "June", "July
 
 // firebase
 // bilal's wifi
-const char ssid[] = "HUAWEI-wzJd";
-const char pass[] = "Anw98JEj";
+// const char ssid[] = "HUAWEI-wzJd";
+// const char pass[] = "Anw98JEj";
 // firebase
 // mushi's hotspot
-// const char ssid[] = "SHO Gulbano";
-// const char pass[] = "@minecraft@";
+const char ssid[] = "SHO Gulbano";
+const char pass[] = "@minecraft@";
 // bilal's hotspot
 // const char ssid[] = "redmi 8";
 // const char pass[] = "spothot20101";
@@ -270,10 +270,10 @@ void loop() {
       lcd.setCursor(-4,2); 
       lcd.print("BMI: ");
       lcd.print(bmi);
-    
-      delay(3000);
-      // lcd
-      lcd.clear();
+    // tap card message
+      lcd.setCursor(-4,3); 
+      lcd.print("SCAN CARD :)");
+      delay(1000);
   }
 
   timeClient.update();
