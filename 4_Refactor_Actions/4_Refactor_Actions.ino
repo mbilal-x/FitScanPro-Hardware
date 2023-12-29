@@ -61,12 +61,12 @@ boolean checkIn = true;
 String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 //Month names
 String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-
+String currentDate = "";
 
 // firebase
 // bilal's wifi
-// const char ssid[] = "HUAWEI-wzJd";
-// const char pass[] = "Anw98JEj";
+const char ssid[] = "HUAWEI-wzJd";
+const char pass[] = "Anw98JEj";
 // firebase
 // mushi's hotspot
 // const char ssid[] = "SHO Gulbano";
@@ -75,8 +75,11 @@ String months[12]={"January", "February", "March", "April", "May", "June", "July
 // const char ssid[] = "redmi 8";
 // const char pass[] = "spothot20101";
 // bilal's PC hotspot
-const char ssid[] = "bilal";
-const char pass[] = "12345678";
+// const char ssid[] = "bilal";
+// const char pass[] = "12345678";
+// Generic hotspot
+// const char ssid[] = "wifi";
+// const char pass[] = "password";
 
 
 // wifi
@@ -101,12 +104,40 @@ void connect() {
   lcd.print("CONNECTED");
 }
 
+// function for time utilities
+String getTime(){
+  // time
+        timeClient.begin();
+        timeClient.setTimeOffset(utcOffsetInSeconds);
+        // time
+        timeClient.update();  
+        // time calculations
+        time_t epochTime = timeClient.getEpochTime();
+        struct tm *ptm = gmtime ((time_t *)&epochTime);
+        int monthDay = ptm->tm_mday;
+        int currentMonth = ptm->tm_mon+1;
+        String currentMonthName = months[currentMonth-1];
+        int currentYear = ptm->tm_year+1900;
+        //Print complete date:
+        currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay);
+        Serial.print("Current date: ");
+        Serial.println(currentDate);
+
+        return currentDate;
+}
+
+// function to sync the data transfer
+void clearSerialBuffer() {
+  while (Serial.available() > 0) {
+    char incomingByte = Serial.read(); // Read and discard each byte
+  }
+}
+
 // SETUP SETUP SETUP SETUP
 void setup() {
   Serial.begin(9600); // Initialize serial communication
 
   // wifi
-    Serial.begin(9600);
     WiFi.begin(ssid, pass);
 
   // rfid
@@ -129,6 +160,9 @@ void setup() {
 //  LOOP LOOP LOOP LOOP
 void loop() {
 
+  // calling clearSerialBuffer function
+  clearSerialBuffer();
+
   // tap card message
   lcd.clear();
   lcd.setCursor(0,0); 
@@ -137,7 +171,6 @@ void loop() {
   lcd.print("FITSCANPRO");
   lcd.setCursor(-4,3);
   lcd.print("[SCAN YOUR CARD]");
-  delay(1000);
 
   // condition 1 for rfid detection
   if (rfid.findCard(PICC_REQIDL, str) == MI_OK)   //Wait for a tag to be placed near the reader
@@ -145,18 +178,18 @@ void loop() {
     
     String temp = "";                             //Temporary variable to store the read RFID number
     if (rfid.anticoll(str) == MI_OK)              //Anti-collision detection, read tag serial number 
-    { 
+    {
       // Serial.print("The card's ID number is : "); 
       for (int i = 0; i < 4; i++)                 //Record and display the tag serial number 
       { 
         temp = temp + (0x0F & (str[i] >> 4)); 
         temp = temp + (0x0F & str[i]); 
-      } 
+      }
       // Serial.println (temp);
       Serial.println("Card Detected"); 
       // lcd
       lcd.clear();
-      lcd.setCursor(0,0);   
+      lcd.setCursor(0,0); 
       lcd.print("CARD DETECTED!");
       delay(1000);
       lcd.setCursor(-4,2);   
@@ -167,22 +200,6 @@ void loop() {
       // condition 2 rfid Authentication
       if(Firebase.getInt(firebaseData, uidPath+"/users/"+temp)){
 
-        // time
-        timeClient.begin();
-        timeClient.setTimeOffset(utcOffsetInSeconds);
-        // time
-        timeClient.update();    
-        // time calculations
-        time_t epochTime = timeClient.getEpochTime();
-        struct tm *ptm = gmtime ((time_t *)&epochTime);
-        int monthDay = ptm->tm_mday;
-        int currentMonth = ptm->tm_mon+1;
-        String currentMonthName = months[currentMonth-1];
-        int currentYear = ptm->tm_year+1900;
-        //Print complete date:
-        String currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay);
-        Serial.print("Current date: ");
-        Serial.println(currentDate);
 
         // condition 3 for getting and calculating data from sensors on Wemos D1R1
         if (Serial.available() > 0) {
@@ -231,7 +248,11 @@ void loop() {
             lcd.print(bmi);
           delay(5000);
         }
-  
+        else{
+          Serial.print("Serial Error!!!");
+        }
+
+        currentDate = getTime();
         updateData.set("date", String(currentDate));
         updateData.set("time", String(timeClient.getFormattedTime()));
         updateData.set("uid", temp);
@@ -256,18 +277,17 @@ void loop() {
     }
     else
     {
-      Serial.println("FAILED");
       Serial.println("REASON: " + firebaseData.errorReason());
       // lcd
       lcd.clear();
       lcd.setCursor(0,0); 
-      lcd.print("LOGIN FAILED!");
+      lcd.print("REQUEST FAILED!");
       delay(3000);
     }
-  } 
+    }
     rfid.selectTag(str); //Lock card to prevent a redundant read, removing the line will make the sketch read cards continually
     
   }
+  delay(1500);
   rfid.halt();
 }
-
