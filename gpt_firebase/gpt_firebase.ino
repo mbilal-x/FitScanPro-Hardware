@@ -2,12 +2,12 @@
 #include <FirebaseArduino.h>
 
 // Firebase credentials
-#define FIREBASE_HOST "code-testing-c4585-default-rtdb.firebaseio.com/"
-#define FIREBASE_AUTH ""  // Leave this empty if your database has no security rules (not recommended for production)
+#define FIREBASE_HOST "https://testing2-4f7dd-default-rtdb.firebaseio.com/"
+#define FIREBASE_AUTH "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"  // Leave this empty if your database has no security rules (not recommended for production)
 
 // Wi-Fi credentials
-#define WIFI_SSID "HUAWEI-wzJd"
-#define WIFI_PASSWORD "Anw98JEj"
+#define WIFI_SSID "Bilal"
+#define WIFI_PASSWORD "spothot20101"
 
 // BMI entry value
 float bmi = 18.5;
@@ -38,14 +38,13 @@ void loop() {
 
 void storeBmiEntry(float bmiValue) {
   // Prepare the path for the BMI entry
-  String path = "/bmi_entries/";
+  String path = "/bmi/";
 
   // Convert BMI value to a String for storage in Firebase
   String bmiString = String(bmiValue, 2); // 2 decimal places
 
   // Add the current timestamp as a child node to make the entry unique
-  String timestamp = String(millis());
-  path += timestamp;
+  String rfid = "100867620";
 
   // Store the BMI value under the generated path
   if (Firebase.setString(path, bmiString)) {

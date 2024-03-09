@@ -10,10 +10,6 @@
 #include <SPI.h> 
 #include <RFID.h>
 
-// time server
-#include <WiFiUdp.h>
-#include <NTPClient.h>
-
 // firebase
 // hassaan's firebase link
 // #define FIREBASE_HOST "iotproject-a16f1-default-rtdb.firebaseio.com"
@@ -25,11 +21,6 @@
 // rfid
 RFID rfid(D8, D4);       //D8:pin of tag reader SDA. D0:pin of tag reader RST 
 unsigned char str[MAX_LEN]; //MAX_LEN is 16: size of the array 
-
-// time
-WiFiUDP ntpUDP;
-const long utcOffsetInSeconds = 18000; //(UTC+5)
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
 
 // lcd
 LiquidCrystal_I2C lcd(0x27,16,4);  // set the LCD address to 0x27 or 0x20
@@ -55,13 +46,6 @@ FirebaseJson updateData;
 unsigned long lastMillis = 0;
 String alertMsg;
 boolean checkIn = true;
-
-// time
-  //Week Days
-String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-//Month names
-String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-String currentDate = "";
 
 // firebase
 // bilal's wifi
@@ -102,28 +86,6 @@ void connect() {
   lcd.clear();
   lcd.setCursor(0,1);   
   lcd.print("CONNECTED");
-}
-
-// function for time utilities
-String getTime(){
-  // time
-        timeClient.begin();
-        timeClient.setTimeOffset(utcOffsetInSeconds);
-        // time
-        timeClient.update();  
-        // time calculations
-        time_t epochTime = timeClient.getEpochTime();
-        struct tm *ptm = gmtime ((time_t *)&epochTime);
-        int monthDay = ptm->tm_mday;
-        int currentMonth = ptm->tm_mon+1;
-        String currentMonthName = months[currentMonth-1];
-        int currentYear = ptm->tm_year+1900;
-        //Print complete date:
-        currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay);
-        Serial.print("Current date: ");
-        Serial.println(currentDate);
-
-        return currentDate;
 }
 
 // function to sync the data transfer
@@ -252,15 +214,12 @@ void loop() {
           Serial.print("Serial Error!!!");
         }
 
-        currentDate = getTime();
-        updateData.set("date", String(currentDate));
-        updateData.set("time", String(timeClient.getFormattedTime()));
         updateData.set("uid", temp);
-        updateData.set("height", personHeight);
-        updateData.set("weight", personWeight);
+        // updateData.set("height", personHeight);
+        // updateData.set("weight", personWeight);
         updateData.set("bmi", bmi);
 
-      
+
           if (Firebase.updateNode(firebaseData, uidPath+ "/users/"+temp, updateData)){
             Serial.println(firebaseData.dataPath() +"/"+ firebaseData.pushName()); 
           } else {
@@ -286,7 +245,7 @@ void loop() {
     }
     }
     rfid.selectTag(str); //Lock card to prevent a redundant read, removing the line will make the sketch read cards continually
-    
+  
   }
   delay(1500);
   rfid.halt();

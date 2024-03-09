@@ -10,11 +10,11 @@
 #include <SPI.h>
 #include <MFRC522.h>
  
-#define SS_PIN D8
-#define RST_PIN D4
+#define SS_PIN 10
+#define RST_PIN 9
 
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
- 
+
 MFRC522::MIFARE_Key key; 
  
 void setup() { 

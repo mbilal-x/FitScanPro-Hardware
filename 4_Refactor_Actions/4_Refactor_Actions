@@ -38,7 +38,8 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 LiquidCrystal_I2C lcd(0x27,16,4);  // set the LCD address to 0x27 or 0x20
 
 // uuuuu
-  float standHeight = 177.8;   //for 5feet 10inch stand just for testing agains my height
+  float standHeight = 177.8;  
+  // @todo change the height
   float measuredDistance = 0;
   float personHeight = 0;
   float personHeightInMeter = 0;
@@ -72,8 +73,8 @@ String months[12]={"January", "February", "March", "April", "May", "June", "July
 // const char pass[] = "Anw98JEj";
 // firebase
 // mushi's hotspot
-const char ssid[] = "SHO Gulbano";
-const char pass[] = "@minecraft@";
+// const char ssid[] = "SHO Gulbano";
+// const char pass[] = "@minecraft@";
 // bilal's hotspot
 // const char ssid[] = "redmi 8";
 // const char pass[] = "spothot20101";
