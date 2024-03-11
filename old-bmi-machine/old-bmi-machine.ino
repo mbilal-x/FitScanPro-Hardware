@@ -33,10 +33,17 @@
 // const char pass[] = "12345678";
 
 // firebase
+// // Define the API Key */
+// for bilal's test project
+// #define API_KEY "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
+// // Define the project ID */
+// #define FIREBASE_PROJECT_ID "testing2-4f7dd"
+// for hassaan's FYP project
 // Define the API Key */
-#define API_KEY "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
+#define API_KEY "AIzaSyAcVcB4nUDTuDuvo3yz1Bzsmo60MfY9-fE"
 // Define the project ID */
-#define FIREBASE_PROJECT_ID "testing2-4f7dd"
+#define FIREBASE_PROJECT_ID "final-year-project-6e437"
+
 // Define the user Email and password that alreadey registerd or added in your project */
 #define USER_EMAIL "muhammadbx4@gmail.com"
 #define USER_PASSWORD "123456"
@@ -50,7 +57,7 @@ unsigned char str[MAX_LEN];  //MAX_LEN is 16: size of the array
 LiquidCrystal_I2C lcd(0x27, 16, 4);  // set the LCD address to 0x27 or 0x20
 
 // uuuuu
-float standHeight = 177.8;  //for 5feet 10inch stand just for testing agains my height
+float standHeight = 205;  //for 5feet 10inch stand just for testing agains my height
 float measuredDistance = 0;
 float personHeight = 0;
 float personHeightInMeter = 0;
