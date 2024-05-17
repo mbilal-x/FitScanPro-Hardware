@@ -195,6 +195,8 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("CARD DETECTED!");
+      lcd.setCursor(0, 1);
+      lcd.print(temp);
       delay(1000);
       lcd.setCursor(-4, 2);
       lcd.print("CHECKING");
@@ -293,7 +295,7 @@ void loop() {
         field_transforms.transform_type = firebase_firestore_transform_type_append_missing_elements;
         // For the usage of FirebaseJson, see examples/FirebaseJson/BasicUsage/Create_Edit_Parse/Create_Edit_Parse.ino
         FirebaseJson content;
-        content.set("values/[0]/integerValue", static_cast<int>(bmi));
+        content.set("values/[0]/stringValue", String(bmi).c_str());
         // Set the transformation content.
         field_transforms.transform_content = content.raw();
 
