@@ -5,6 +5,11 @@
 // Provide the token generation process info.
 #include <addons/TokenHelper.h>
 
+
+// time
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
 // LCD
 #include <LiquidCrystal_I2C.h>
 
@@ -16,7 +21,7 @@
 /*  Define the WiFi credentials */
 // #define WIFI_SSID "Bilal"
 // #define WIFI_PASSWORD "spothot20101"
-#define WIFI_SSID "HUAWEI-wzJd"
+#define WIFI_SSID "HUAWEI-wzJd_EXT"
 #define WIFI_PASSWORD "Anw98JEj"
 // old code wifi references
 // bilal's wifi
@@ -78,6 +83,14 @@ unsigned long dataMillis = 0;
 int count = 0;
 
 
+// time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org");
+//Week Days
+String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+//Month names
+String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
 
 // wifi
 // wifi connect function
@@ -106,6 +119,61 @@ void clearSerialBuffer() {
   while (Serial.available() > 0) {
     char incomingByte = Serial.read();  // Read and discard each byte
   }
+}
+
+// time
+String getTime() {
+  timeClient.update();
+
+  time_t epochTime = timeClient.getEpochTime();
+  Serial.print("Epoch Time: ");
+  Serial.println(epochTime);
+  
+  String formattedTime = timeClient.getFormattedTime();
+  Serial.print("Formatted Time: ");
+  Serial.println(formattedTime);  
+
+  int currentHour = timeClient.getHours();
+  Serial.print("Hour: ");
+  Serial.println(currentHour);  
+
+  int currentMinute = timeClient.getMinutes();
+  Serial.print("Minutes: ");
+  Serial.println(currentMinute); 
+   
+  int currentSecond = timeClient.getSeconds();
+  Serial.print("Seconds: ");
+  Serial.println(currentSecond);  
+
+  String weekDay = weekDays[timeClient.getDay()];
+  Serial.print("Week Day: ");
+  Serial.println(weekDay);    
+
+  //Get a time structure
+  struct tm *ptm = gmtime ((time_t *)&epochTime); 
+
+  int monthDay = ptm->tm_mday;
+  Serial.print("Month day: ");
+  Serial.println(monthDay);
+
+  int currentMonth = ptm->tm_mon+1;
+  Serial.print("Month: ");
+  Serial.println(currentMonth);
+
+  String currentMonthName = months[currentMonth-1];
+  Serial.print("Month name: ");
+  Serial.println(currentMonthName);
+
+  int currentYear = ptm->tm_year+1900;
+  Serial.print("Year: ");
+  Serial.println(currentYear);
+
+  //Print complete date:
+  String currentDateTime = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay) + "-" + String(formattedTime);
+  Serial.print("Current date: ");
+  Serial.println(currentDateTime);
+
+  return currentDateTime;
 }
 
 
@@ -159,6 +227,18 @@ void setup() {
   // Limit the size of response payload to be collected in FirebaseData
   fbdo.setResponseSize(2048);
   Firebase.begin(&config, &auth);
+
+  // time
+
+  // Initialize a NTPClient to get time
+  timeClient.begin();
+  // Set offset time in seconds to adjust for your timezone, for example:
+  // GMT +1 = 3600
+  // GMT +8 = 28800
+  // GMT -1 = -3600
+  // GMT 0 = 0
+  // pakistan = GTM + 5 = 18000
+  timeClient.setTimeOffset(18000);
 }
 
 //  LOOP LOOP LOOP LOOP
@@ -266,7 +346,8 @@ void loop() {
           Serial.print("Serial Error!!!");
         }
 
-
+  // time
+  String currentDateTime = getTime();
 
         // append data to firestore
         Serial.print("Commit a document (append array)... ");
@@ -283,8 +364,8 @@ void loop() {
         transform_write.document_transform.transform_document_path = "bmiCollection/"+temp;
         // Set a transformation of a field of the document.
         struct firebase_firestore_document_write_field_transforms_t field_transforms;
-        // Set field path to write.
-        field_transforms.fieldPath = "bmi";
+ // Set field path to write.
+        field_transforms.fieldPath = "bmiEntries";
         // Set the transformation type.
         // firebase_firestore_transform_type_set_to_server_value,
         // firebase_firestore_transform_type_increment,
@@ -295,7 +376,11 @@ void loop() {
         field_transforms.transform_type = firebase_firestore_transform_type_append_missing_elements;
         // For the usage of FirebaseJson, see examples/FirebaseJson/BasicUsage/Create_Edit_Parse/Create_Edit_Parse.ino
         FirebaseJson content;
-        content.set("values/[0]/stringValue", String(bmi).c_str());
+        content.set("values/[0]/mapValue/fields/height/stringValue",  String(personHeight).c_str());
+        content.set("values/[0]/mapValue/fields/weight/stringValue",   String(personWeight).c_str());
+        content.set("values/[0]/mapValue/fields/bmi/stringValue",  String(bmi).c_str());
+        content.set("values/[0]/mapValue/fields/timeStamp/stringValue",  String(currentDateTime).c_str());
+
         // Set the transformation content.
         field_transforms.transform_content = content.raw();
 
@@ -333,3 +418,6 @@ void loop() {
   delay(1500);
   rfid.halt();
 }
+
+
+// test rfid uid 100867620 for temp variable
