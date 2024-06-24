@@ -20,4 +20,4 @@ My GitHub: [Muhammad Bilal](https://github.com/mbilal-x)
 Project Link: [here](https://github.com/mbilal-x/FYP-BCS-2020-2024)
 
 This Repository contains App Secrets and is Private.
-Only accessible the link provided
+Only accessible with the link provided
