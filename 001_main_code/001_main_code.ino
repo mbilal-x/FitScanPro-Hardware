@@ -19,37 +19,17 @@
 
 // wifi
 /*  Define the WiFi credentials */
-// #define WIFI_SSID "Bilal"
-// #define WIFI_PASSWORD "spothot20101"
-#define WIFI_SSID "HUAWEI-wzJd_EXT"
-#define WIFI_PASSWORD "Anw98JEj"
-// old code wifi references
-// bilal's wifi
-// const char ssid[] = "HUAWEI-wzJd";
-// const char pass[] = "Anw98JEj";
-// mushi's hotspot
-// const char ssid[] = "SHO Gulbano";
-// const char pass[] = "@minecraft@";
-// bilal's mobile hotspot
-// const char ssid[] = "redmi 8";
-// const char pass[] = "spothot20101";
-// bilal's PC hotspot
-// const char ssid[] = "bilal";
-// const char pass[] = "12345678";
+#define WIFI_SSID "YOURWIFISSID"
+#define WIFI_PASSWORD "YOURWIFIPASSWORD"
+
 
 // firebase
 // // Define the API Key */
-// for bilal's test project
-// #define API_KEY "AIzaSyDtMLCu_XUJUviuXjc0fZ8D_7kkoK9Pj_Q"
-// // Define the project ID */
-// #define FIREBASE_PROJECT_ID "testing2-4f7dd"
-// for hassaan's FYP project
-// Define the API Key */
 #define API_KEY "AIzaSyAcVcB4nUDTuDuvo3yz1Bzsmo60MfY9-fE"
 // Define the project ID */
 #define FIREBASE_PROJECT_ID "final-year-project-6e437"
 
-// Define the user Email and password that alreadey registerd or added in your project */
+// Define the user Email and password that is already registered and added as admin hardware in your project for authentication*/
 #define USER_EMAIL "muhammadbx4@gmail.com"
 #define USER_PASSWORD "123456"
 
@@ -204,7 +184,7 @@ void fcsUploadCallback(CFS_UploadStatusInfo info) {
   }
 }
 
-// SETUP SETUP SETUP SETUP
+// SETUP SETUP SETUP SETUP [visual start marker]
 void setup() {
   Serial.begin(9600);  // Initialize serial communication
 
@@ -252,7 +232,7 @@ void setup() {
   timeClient.setTimeOffset(18000);
 }
 
-//  LOOP LOOP LOOP LOOP
+//  LOOP LOOP LOOP LOOP [ visual marker for loop starting]
 void loop() {
 
   // calling clearSerialBuffer function
@@ -322,8 +302,9 @@ void loop() {
           float personHeightInFeet = personHeight * 0.0328;
           int feet = int(personHeightInFeet);
           int inches = int((personHeightInFeet - feet) * 12);
+          // [for testing purposes]
           // Serial.print("Person's height in feet: ");
-          // Serial.print(feet, "feet", inches, "inches");
+          // Serial.print(feet, "feet", inches, "inches");    
           // height
           Serial.print("Received Height: ");
           Serial.println(personHeight);
@@ -357,8 +338,6 @@ void loop() {
           lcd.print("BMI: ");
           lcd.print(bmi);
           // display bmiCategory
-
-          // should be on line 4
           lcd.setCursor(-4, 3);
           lcd.print("BMI: ");
           lcd.print(bmiCategory);
